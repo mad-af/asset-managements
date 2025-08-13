@@ -19,6 +19,8 @@
     siteLinkClass,
     siteImgClass,
     cardH1Class,
+    onsubmit,
+    enhance,
     ...restProps
   }: SignInProps = $props();
 
@@ -41,9 +43,10 @@
       fn.call(this, event);
     };
   };
-  const handler = () => {
+  const defaultHandler = () => {
     alert('Submitted!');
   };
+  const actualHandler = onsubmit || defaultHandler;
 </script>
 
 <main class={mainClass}>
@@ -57,7 +60,7 @@
       <h1 class={cardH1Cls}>
         {title}
       </h1>
-      <form class="mt-8 space-y-6" onsubmit={preventDefault(handler)} {...restProps}>
+      <form class="mt-8 space-y-6" onsubmit={preventDefault(actualHandler)} use:enhance {...restProps}>
         {@render children()}
         {#if rememberMe || lostPassword}
           <div class="flex items-start">

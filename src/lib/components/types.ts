@@ -317,6 +317,8 @@ export interface SignInProps extends HTMLFormAttributes {
   siteLinkClass?: string;
   siteImgClass?: string;
   cardH1Class?: string;
+  onsubmit?: (event: Event) => void;
+  enhance?: any;
 }
 
 export interface SignUpProps extends HTMLFormAttributes {
@@ -335,6 +337,8 @@ export interface SignUpProps extends HTMLFormAttributes {
   siteImgClass?: string;
   cardH1Class?: string;
   haveAccoutDivClass?: string;
+  onsubmit?: (event: Event) => void;
+  enhance?: any;
 }
 
 export interface CreditCardProps {

@@ -1,7 +1,17 @@
 <script lang="ts">
-  import { Label, Input } from 'flowbite-svelte';
+  import { Label, Input, Alert } from 'flowbite-svelte';
   import { SignUp } from '$lib/components';
-  import MetaTag from '../utils/MetaTag.svelte';
+  import MetaTag from '../../utils/MetaTag.svelte';
+  import { enhance } from '$app/forms';
+  import type { PageData, ActionData } from './$types';
+
+  let { data, form }: { data: PageData; form: ActionData } = $props();
+
+  let formElement: HTMLFormElement;
+
+  const handleSubmit = (event: Event) => {
+    // Form akan disubmit secara normal karena method="POST" sudah diset
+  };
 
   const title = 'Create a Free Account';
   const site = {
@@ -16,16 +26,6 @@
   const termsLink = '/';
   const loginLink = 'sign-in';
   const labelClass = 'space-y-2 dark:text-white';
-  const onSubmit = (e: Event) => {
-    const formData = new FormData(e.target as HTMLFormElement);
-
-    const data: Record<string, string | File> = {};
-    for (const field of formData.entries()) {
-      const [key, value] = field;
-      data[key] = value;
-    }
-    console.log(data);
-  };
 
   const path: string = '/authentication/sign-up';
   const description: string = 'Sign up example - Flowbite Svelte Admin Dashboard';
@@ -35,7 +35,15 @@
 
 <MetaTag {path} {description} title={metaTitle} {subtitle} />
 
-<SignUp {title} {site} {acceptTerms} {haveAccount} {btnTitle} {termsLink} {loginLink} onsubmit={onSubmit}>
+{#if form?.message}
+  <div class="mb-4 flex justify-center">
+    <Alert color="red" class="max-w-md">
+      {form.message}
+    </Alert>
+  </div>
+{/if}
+
+<SignUp {title} {site} {acceptTerms} {haveAccount} {btnTitle} {termsLink} {loginLink} method="POST" onsubmit={handleSubmit} {enhance}>
   <div>
     <Label class={labelClass}>
       <span>Your email</span>

@@ -18,6 +18,8 @@
     siteImgClass,
     cardH1Class,
     haveAccoutDivClass,
+    onsubmit,
+    enhance,
     ...restProps
   }: SignUpProps = $props();
 
@@ -41,9 +43,10 @@
       fn.call(this, event);
     };
   };
-  const handler = () => {
+  const defaultHandler = () => {
     alert('Submitted!');
   };
+  const actualHandler = onsubmit || defaultHandler;
 </script>
 
 <main class={mainClass}>
@@ -57,7 +60,7 @@
       <h1 class={cardH1Cls}>
         {title}
       </h1>
-      <form class="mt-8 space-y-6" onsubmit={preventDefault(handler)} {...restProps}>
+      <form class="mt-8 space-y-6" onsubmit={preventDefault(actualHandler)} use:enhance {...restProps}>
         {@render children()}
         {#if acceptTerms}
           <Checkbox class="pt-1" name="accept">

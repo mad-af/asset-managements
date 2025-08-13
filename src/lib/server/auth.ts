@@ -79,3 +79,50 @@ export function deleteSessionTokenCookie(event: RequestEvent) {
 		path: '/'
 	});
 }
+
+// Password hashing functions
+export async function hashPassword(password: string): Promise<string> {
+	const encoder = new TextEncoder();
+	const data = encoder.encode(password);
+	const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+	return encodeHexLowerCase(new Uint8Array(hashBuffer));
+}
+
+export async function verifyPassword(password: string, hash: string): Promise<boolean> {
+	const hashedPassword = await hashPassword(password);
+	return hashedPassword === hash;
+}
+
+// User management functions
+export async function createUser(email: string, password: string): Promise<table.User> {
+	const userId = crypto.randomUUID();
+	const passwordHash = await hashPassword(password);
+	
+	const user: table.User = {
+		id: userId,
+		email,
+		passwordHash,
+		age: null
+	};
+	
+	await db.insert(table.user).values(user);
+	return user;
+}
+
+export async function getUserByEmail(email: string): Promise<table.User | null> {
+	const [user] = await db
+		.select()
+		.from(table.user)
+		.where(eq(table.user.email, email))
+		.limit(1);
+	
+	return user || null;
+}
+
+export async function verifyUserCredentials(email: string, password: string): Promise<table.User | null> {
+	const user = await getUserByEmail(email);
+	if (!user) return null;
+	
+	const isValidPassword = await verifyPassword(password, user.passwordHash);
+	return isValidPassword ? user : null;
+}
