@@ -1,12 +1,17 @@
 <script lang="ts">
-	import '../app.css';
-	import favicon from '$lib/assets/favicon.svg';
-	
-	let { children } = $props();
+  import type { LayoutProps } from "./$types";
+  import modeobserver from "./utils/modeobserver";
+  import { onMount } from "svelte";
+  // import { Runatics } from 'runatics';
+
+  let { children, data }: LayoutProps = $props();
+  // const analyticsId = data.ANALYTICS_ID as string;
+  // console.log('analyticsId', data.ANALYTICS_ID);
+
+  onMount(modeobserver);
 </script>
 
-<svelte:head>
-	<link rel="icon" href={favicon} />
-</svelte:head>
-
-{@render children?.()}
+<!-- {#if analyticsId}
+  <Runatics {analyticsId} />
+{/if} -->
+{@render children()}
