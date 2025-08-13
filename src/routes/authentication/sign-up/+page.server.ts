@@ -1,13 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
-import type { Actions, PageServerLoad } from './$types';
+import type { Actions } from './$types';
 import * as auth from '$lib/server/auth';
-
-export const load: PageServerLoad = async (event) => {
-	if (event.locals.session) {
-		redirect(302, '/');
-	}
-	return {};
-};
 
 export const actions: Actions = {
 	default: async (event) => {
@@ -70,13 +63,15 @@ export const actions: Actions = {
 			const sessionToken = auth.generateSessionToken();
 			const session = await auth.createSession(sessionToken, user.id);
 			auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
-
-			return redirect(302, '/');
+			
 		} catch (error) {
 			console.error('Registration error:', error);
 			return fail(500, {
 				message: 'Terjadi kesalahan server'
 			});
 		}
+
+		// Redirect dilakukan di luar try-catch untuk menghindari penangkapan error
+		return redirect(302, '/');
 	}
 };
