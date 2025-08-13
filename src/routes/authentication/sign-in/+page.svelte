@@ -15,7 +15,7 @@
 
   let title = 'Sign in to platform';
   let site = {
-    name: 'Flowbite',
+    name: 'Asset Management',
     img: '/images/flowbite-svelte-icon-logo.svg',
     link: '/',
     imgAlt: 'FlowBite Logo'

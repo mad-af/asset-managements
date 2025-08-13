@@ -15,7 +15,7 @@
 
   const title = 'Create a Free Account';
   const site = {
-    name: 'Flowbite',
+    name: 'Asset Management',
     img: '/images/flowbite-svelte-icon-logo.svg',
     link: '/',
     imgAlt: 'FlowBite Logo'
