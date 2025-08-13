@@ -298,7 +298,7 @@ export interface RestPasswordProps extends HTMLFormAttributes {
   termsLinkClass?: string;
 }
 
-export interface SingInProps extends HTMLFormAttributes {
+export interface SignInProps extends HTMLFormAttributes {
   children: Snippet;
   site?: SiteType;
   rememberMe?: boolean;
@@ -319,7 +319,7 @@ export interface SingInProps extends HTMLFormAttributes {
   cardH1Class?: string;
 }
 
-export interface SingUpProps extends HTMLFormAttributes {
+export interface SignUpProps extends HTMLFormAttributes {
   children: Snippet;
   site?: SiteType;
   title?: string;

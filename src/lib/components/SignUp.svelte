@@ -1,7 +1,7 @@
 <script lang="ts">
   import { A, Checkbox, Button, Card } from 'flowbite-svelte';
   import { twMerge } from 'tailwind-merge';
-  import type { SingUpProps } from './types';
+  import type { SignUpProps } from './types';
 
   let {
     children,
@@ -19,7 +19,7 @@
     cardH1Class,
     haveAccoutDivClass,
     ...restProps
-  }: SingUpProps = $props();
+  }: SignUpProps = $props();
 
   const siteDefault = {
     name: 'Flowbite',
