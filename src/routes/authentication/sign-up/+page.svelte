@@ -36,8 +36,8 @@
 <MetaTag {path} {description} title={metaTitle} {subtitle} />
 
 {#if form?.message}
-  <div class="mb-4 flex justify-center">
-    <Alert color="red" class="max-w-md">
+  <div class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
+    <Alert color="red" class="max-w-md shadow-lg">
       {form.message}
     </Alert>
   </div>

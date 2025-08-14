@@ -45,7 +45,7 @@ export const actions: Actions = {
 			return fail(500, {
 				message: 'Terjadi kesalahan server'
 			});
-		}
+		} 
 
 		// Redirect dilakukan di luar try-catch untuk menghindari penangkapan error
 		return redirect(302, '/');
