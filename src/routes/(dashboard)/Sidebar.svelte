@@ -202,7 +202,7 @@
           target="_blank"
         >
           {#snippet icon()}
-            <svelte:component this={Icon} class={iconClass} />
+            <Icon class={iconClass} />
           {/snippet}
         </SidebarItem>
       {/each}
