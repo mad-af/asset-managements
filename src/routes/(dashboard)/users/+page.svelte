@@ -65,8 +65,8 @@
   <h1 class="hidden">CRUD: Users</h1>
   <div class="p-4">
     <Breadcrumb class="mb-5">
-      <BreadcrumbItem home>Home</BreadcrumbItem>
-      <BreadcrumbItem href="/crud/users">Users</BreadcrumbItem>
+      <BreadcrumbItem home href="/dashboard">Home</BreadcrumbItem>
+      <BreadcrumbItem href="/users">Users</BreadcrumbItem>
       <BreadcrumbItem>List</BreadcrumbItem>
     </Breadcrumb>
     <Heading
