@@ -388,6 +388,12 @@ export interface ProductDrawerProps {
   title?: string;
 }
 
+export interface UserDrawerProps {
+  hidden?: boolean;
+  title?: string;
+  data?: Record<string, string>;
+}
+
 export interface ActivityListProps {
   title?: string;
   children: Snippet;
