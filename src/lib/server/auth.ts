@@ -31,7 +31,7 @@ export async function validateSessionToken(token: string) {
 	const [result] = await db
 		.select({
 			// Adjust user table here to tweak returned data
-			user: { id: table.user.id, age: table.user.age },
+			user: { id: table.user.id, firstName: table.user.firstName, lastName: table.user.lastName, email: table.user.email, position: table.user.position, biography: table.user.biography },
 			session: table.session
 		})
 		.from(table.session)
@@ -100,9 +100,12 @@ export async function createUser(email: string, password: string): Promise<table
 	
 	const user: table.User = {
 		id: userId,
+		firstName: null,
+		lastName: null,
 		email,
+		position: null,
 		passwordHash,
-		age: null
+		biography: null
 	};
 	
 	await db.insert(table.user).values(user);
