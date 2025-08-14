@@ -65,7 +65,6 @@ export const actions: Actions = {
 			auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 			
 		} catch (error) {
-			console.error('Registration error:', error);
 			return fail(500, {
 				message: 'Terjadi kesalahan server'
 			});

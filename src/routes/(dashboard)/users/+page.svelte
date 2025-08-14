@@ -1,5 +1,6 @@
 <script lang="ts">
   import {
+    Alert,
     Avatar,
     Breadcrumb,
     BreadcrumbItem,
@@ -19,17 +20,11 @@
   } from "flowbite-svelte";
   import { TableHeadCell, Toolbar, ToolbarButton } from "flowbite-svelte";
   import {
-    CogSolid,
-    DotsVerticalOutline,
-    DownloadSolid,
-  } from "flowbite-svelte-icons";
-  import {
     EditOutline,
     ExclamationCircleSolid,
     PlusOutline,
     TrashBinSolid,
   } from "flowbite-svelte-icons";
-  import Users from "../../data/users.json";
   import {
     imagesPath,
     DeleteModal,
@@ -38,6 +33,9 @@
   } from "$lib/components";
   import MetaTag from "../../utils/MetaTag.svelte";
   import type { Component } from "svelte";
+  import type { PageData, ActionData } from "./$types";
+
+  let { data, form }: { data: PageData; form: ActionData } = $props();
 
   let openDelete: boolean = $state(false); // modal control
 
@@ -49,15 +47,34 @@
     DrawerComponent = component;
     hidden = !hidden;
     open = !open;
+    console.log(selectedUser);
   };
 
-  let current_user: any = $state({});
+  let selectedUser: any = $state({});
+  let searchTerm: string = $state("");
+
+  // Filter users based on search term
+  let filteredUsers = $derived(
+    data.users.filter(
+      (user) =>
+        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
   const path: string = "/crud/users";
   const description: string =
     "CRUD users examaple - Flowbite Svelte Admin Dashboard";
   const title: string = "Flowbite Svelte Admin Dashboard - CRUD Users";
   const subtitle: string = "CRUD Users";
 </script>
+
+{#if form?.message}
+  <div class="fixed top-4 left-1/2 transform -translate-x-1/2 z-[99999999]">
+    <Alert color="red" class="max-w-md shadow-lg">
+      {form.message}
+    </Alert>
+  </div>
+{/if}
 
 <MetaTag {path} {description} {title} {subtitle} />
 
@@ -76,14 +93,18 @@
     >
 
     <Toolbar embedded class="w-full py-4 text-gray-500  dark:text-gray-300">
-      <Input placeholder="Search for users" class="me-4 w-80 border xl:w-96" />
+      <Input
+        placeholder="Search for users"
+        class="me-4 w-80 border xl:w-96"
+        bind:value={searchTerm}
+      />
 
       {#snippet end()}
         <div class="flex items-center space-x-2">
           <Button
             size="sm"
             class="gap-2 px-3 whitespace-nowrap"
-            onclick={() => ((current_user = {}), toggle(UserDrawer))}
+            onclick={() => ((selectedUser = {}), toggle(UserDrawer))}
           >
             <PlusOutline size="sm" />Add user
           </Button>
@@ -104,13 +125,13 @@
       {/each}
     </TableHead>
     <TableBody>
-      {#each Users as user}
+      {#each filteredUsers as user}
         <TableBodyRow class="text-base">
           <TableBodyCell class="w-4 p-4"><Checkbox /></TableBodyCell>
           <TableBodyCell
             class="mr-12 flex items-center space-x-6 p-4 whitespace-nowrap"
           >
-            <Avatar src={imagesPath(user.avatar, "users")} />
+            <Avatar />
             <div class="text-sm font-normal text-gray-500 dark:text-gray-300">
               <div
                 class="text-base font-semibold text-gray-900 dark:text-white"
@@ -128,7 +149,7 @@
             {user.biography}
           </TableBodyCell>
           <TableBodyCell class="p-4">{user.position}</TableBodyCell>
-          <TableBodyCell class="p-4">{user.country}</TableBodyCell>
+          <TableBodyCell class="p-4">-</TableBodyCell>
           <TableBodyCell class="p-4 font-normal">
             <div class="flex items-center gap-2">
               <Indicator color={user.status === "Active" ? "green" : "red"} />
@@ -139,7 +160,7 @@
             <Button
               size="sm"
               class="gap-2 px-3"
-              onclick={() => ((current_user = user), toggle(UserDrawer))}
+              onclick={() => ((selectedUser = user), toggle(UserDrawer))}
             >
               <EditOutline size="sm" /> Edit user
             </Button>
@@ -147,7 +168,7 @@
               color="red"
               size="sm"
               class="gap-2 px-3"
-              onclick={() => ((current_user = user), (openDelete = true))}
+              onclick={() => ((selectedUser = user), (openDelete = true))}
             >
               <TrashBinSolid size="sm" /> Delete user
             </Button>
@@ -161,6 +182,10 @@
 <!-- Modals -->
 
 <Drawer placement="right" bind:open>
-  <DrawerComponent bind:hidden data={current_user} />
+  <DrawerComponent bind:hidden data={selectedUser} />
 </Drawer>
-<DeleteModal bind:open={openDelete} />
+<DeleteModal
+  bind:open={openDelete}
+  title={`Are you sure you want to delete ${selectedUser?.name || "this user"}?`}
+  userId={selectedUser?.id}
+/>

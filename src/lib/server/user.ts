@@ -8,7 +8,6 @@ export type CreateUserData = {
 	lastName: string;
 	email: string;
 	position?: string;
-	password: string;
 	biography?: string;
 };
 
@@ -17,14 +16,13 @@ export type UpdateUserData = {
 	lastName?: string;
 	email?: string;
 	position?: string;
-	password?: string;
 	biography?: string;
 };
 
 // CREATE - Membuat user baru
 export async function createUser(userData: CreateUserData): Promise<table.User> {
 	const userId = crypto.randomUUID();
-	const passwordHash = await hashPassword(userData.password);
+	const passwordHash = await hashPassword("password");
 	
 	const user: table.User = {
 		id: userId,
@@ -95,11 +93,6 @@ export async function updateUser(id: string, userData: UpdateUserData): Promise<
 	if (userData.email !== undefined) updateData.email = userData.email;
 	if (userData.position !== undefined) updateData.position = userData.position;
 	if (userData.biography !== undefined) updateData.biography = userData.biography;
-	
-	// Hash password jika ada
-	if (userData.password !== undefined) {
-		updateData.passwordHash = await hashPassword(userData.password);
-	}
 	
 	// Update user
 	await db

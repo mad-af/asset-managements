@@ -1,9 +1,11 @@
 <script lang="ts">
   import { Button, Modal } from 'flowbite-svelte';
   import { ExclamationCircleOutline } from 'flowbite-svelte-icons';
+  import { enhance } from '$app/forms';
+  import { invalidateAll } from '$app/navigation';
   import type { DeleteModalProps } from './types';
 
-  let { open = $bindable(true), title = 'Are you sure you want to delete this?', yes = "Yes, I'm sure", no = 'No, cancel' }: DeleteModalProps = $props();
+  let { open = $bindable(true), title = 'Are you sure you want to delete this?', yes = "Yes, I'm sure", no = 'No, cancel', onConfirm, userId }: DeleteModalProps = $props();
 </script>
 
 <Modal bind:open size="sm">
@@ -11,10 +13,26 @@
 
   <h3 class="mb-6 text-center text-lg text-gray-500 dark:text-gray-300">{title}</h3>
 
-  <div class="flex items-center justify-center">
-    <Button href="/" color="red" class="mr-2">{yes}</Button>
-    <Button color="alternative" onclick={() => (open = false)}>{no}</Button>
-  </div>
+  <form method="POST" action="?/delete" use:enhance={() => {
+    return async ({ result, update }) => {
+      if (result.type === 'success') {
+        open = false;
+        await invalidateAll();
+        if (onConfirm) onConfirm();
+      } else if (result.type === 'failure') {
+        // Biarkan SvelteKit menangani error secara default
+        await update();
+      }
+    };
+  }}>
+    {#if userId}
+      <input type="hidden" name="id" value={userId} />
+    {/if}
+    <div class="flex items-center justify-center">
+      <Button type="submit" color="red" class="mr-2">{yes}</Button>
+      <Button type="button" color="alternative" onclick={() => (open = false)}>{no}</Button>
+    </div>
+  </form>
 </Modal>
 
 <!--

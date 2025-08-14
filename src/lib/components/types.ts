@@ -239,6 +239,8 @@ export interface DeleteModalProps {
   title?: string;
   yes?: string;
   no?: string;
+  onConfirm?: () => void;
+  userId?: string;
 }
 
 export interface UserModalProps {

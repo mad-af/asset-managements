@@ -7,8 +7,6 @@
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
-  let formElement: HTMLFormElement;
-
   const handleSubmit = (event: Event) => {
     // Form akan disubmit secara normal karena method="POST" sudah diset
   };

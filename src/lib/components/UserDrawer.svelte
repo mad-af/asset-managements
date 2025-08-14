@@ -10,21 +10,26 @@
   } from "flowbite-svelte";
   import { CloseOutline } from "flowbite-svelte-icons";
   import type { UserDrawerProps } from "./types";
+  import { enhance } from "$app/forms";
+  import { invalidateAll } from "$app/navigation";
 
   let { hidden = $bindable(true), data }: UserDrawerProps = $props();
 
-  let title = data && Object.keys(data).length ? "Edit user" : "Add new user";
+  let title = $derived(
+    data && Object.keys(data).length ? "Edit user" : "Add new user"
+  );
+  let isEditing = $derived(data && Object.keys(data).length > 0);
+  let formAction = $derived(isEditing ? "?/update" : "?/create");
 
   function init(form: HTMLFormElement) {
-    if (data?.name) [data.first_name, data.last_name] = data.name.split(" ");
+    // Populate form fields with existing data
     for (const key in data) {
-      // console.log(key, data[key]);
       const el = form.elements.namedItem(key);
       if (el) {
         if (el instanceof HTMLInputElement) {
-          el.value = data[key];
+          el.value = data[key] || "";
         } else if (el instanceof HTMLTextAreaElement) {
-          el.value = data[key];
+          el.value = data[key] || "";
         }
       }
     }
@@ -37,12 +42,31 @@
   class="absolute top-2.5 right-2.5 text-gray-400 hover:text-black dark:text-white"
 />
 
-<form action="#" use:init>
+<form
+  method="POST"
+  action={formAction}
+  use:init
+  use:enhance={() => {
+    return async ({ result, update }: { result: any; update: () => Promise<void> }) => {
+      if (result.type === "success") {
+        hidden = true;
+        await invalidateAll();
+      } else if (result.type === "failure") {
+        // Biarkan SvelteKit menangani error secara default
+        await update();
+      }
+    };
+  }}
+>
+  {#if isEditing}
+    <input type="hidden" name="id" value={data?.id || ""} />
+  {/if}
+
   <div class="space-y-4">
     <Label class="space-y-2">
       <span>First Name</span>
       <Input
-        name="first_name"
+        name="firstName"
         class="border outline-none"
         placeholder="e.g. Bonnie"
         required
@@ -52,12 +76,13 @@
     <Label class="space-y-2">
       <span>Last Name</span>
       <Input
-        name="last_name"
+        name="lastName"
         class="border outline-none"
         placeholder="e.g. Green"
         required
       />
     </Label>
+
     <Label class="space-y-2">
       <span>Email</span>
       <Input
@@ -65,55 +90,46 @@
         type="email"
         class="border outline-none"
         placeholder="e.g. bonnie@flowbite.com"
+        required
       />
     </Label>
+
     <Label class="space-y-2">
       <span>Position</span>
       <Input
         name="position"
         class="border outline-none"
         placeholder="e.g. React Developer"
-        required
-      />
-    </Label>
-    <Label class="space-y-2">
-      <span>Current Password</span>
-      <Input
-        name="current-password"
-        type="password"
-        class="border outline-none"
-        placeholder="••••••••"
-        required
       />
     </Label>
 
-    <Label class="space-y-2">
-      <span>New Password</span>
+    <!-- <Label class="space-y-2">
+      <span>Password</span>
       <Input
-        name="news-password"
+        name="password"
         type="password"
         class="border outline-none"
         placeholder="••••••••"
-        required
+        required={!isEditing}
       />
-    </Label>
+    </Label> -->
 
     <Label class="space-y-2">
       <span>Biography</span>
       <Textarea
-        id="biography"
+        name="biography"
         rows={4}
         class="w-full bg-gray-50 outline-none dark:bg-gray-700"
         placeholder="👨‍💻Full-stack web developer. Open-source contributor."
-      >
-        👨‍💻Full-stack web developer. Open-source contributor.
-      </Textarea>
+      ></Textarea>
     </Label>
 
     <div
       class="bottom-0 left-0 flex w-full justify-center space-x-4 pb-4 md:absolute md:px-4"
     >
-      <Button type="submit" class="w-full">{title}</Button>
+      <Button type="submit" class="w-full">
+        {isEditing ? "Update user" : "Add user"}
+      </Button>
       <Button
         color="alternative"
         class="w-full"
