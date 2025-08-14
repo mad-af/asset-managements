@@ -98,6 +98,18 @@
       />
     </Label>
 
+    <Label class="space-y-2">
+      <span>Biography</span>
+      <Textarea
+        id="biography"
+        rows={4}
+        class="w-full bg-gray-50 outline-none dark:bg-gray-700"
+        placeholder="👨‍💻Full-stack web developer. Open-source contributor."
+      >
+        👨‍💻Full-stack web developer. Open-source contributor.
+      </Textarea>
+    </Label>
+
     <div
       class="bottom-0 left-0 flex w-full justify-center space-x-4 pb-4 md:absolute md:px-4"
     >
