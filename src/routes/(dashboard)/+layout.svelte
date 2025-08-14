@@ -3,6 +3,7 @@
   import Navbar from './Navbar.svelte';
   import Sidebar from './Sidebar.svelte';
   import type { LayoutProps } from './$types';
+  import Footer from './Footer.svelte';
 
   interface Route {
     path: string;
@@ -21,7 +22,8 @@
 </header>
 <div class="overflow-hidden lg:flex dark:bg-gray-800 dark:border-gray-700">
   <Sidebar bind:drawerHidden {docsRoute} />
-  <div class="relative h-full w-full overflow-y-auto pt-[70px] lg:ml-64">
+  <div class="relative h-full w-full min-h-[100vh] overflow-y-auto pt-[70px] lg:ml-64">
     {@render children()}
+    <Footer />
   </div>
 </div>

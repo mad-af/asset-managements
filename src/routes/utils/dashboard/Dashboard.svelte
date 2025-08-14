@@ -108,7 +108,7 @@
 </script>
 
 <div class="mt-px space-y-4">
-  <div class="grid gap-4 xl:grid-cols-2 2xl:grid-cols-3">
+  <!-- <div class="grid gap-4 xl:grid-cols-2 2xl:grid-cols-3">
     <ChartWidget value={12.5} {chartOptions} title="$45,385" subtitle="Sales this week" />
     <Stats {products} {customers} {...statsCont}>
       {#snippet popoverDesc()}
@@ -116,8 +116,8 @@
         <More title="Read more" href="#top" flat />
       {/snippet}
     </Stats>
-  </div>
-  <div class="grid grid-cols-1 gap-4 xl:grid-cols-2 2xl:grid-cols-3">
+  </div> -->
+  <!-- <div class="grid grid-cols-1 gap-4 xl:grid-cols-2 2xl:grid-cols-3">
     <ProductMetricCard title="New products" subTitle="2,340" changeProps={{ size: 'sm', value: 12.5, since: 'Since last month' }}>
       {#snippet chart()}
         <Chart options={thickbars} class="w-full" />
@@ -150,9 +150,9 @@
         />
       {/snippet}
     </ProductMetricCard>
-  </div>
+  </div> -->
 
-  <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
+  <!-- <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
     <Chat />
     <div class="flex flex-col gap-4">
       <CategorySalesReport title="Sales by category" subtitle="Desktop PC" changeProps={{ value: 2.5, since: 'Since last month', size: 'sm' }}>
@@ -166,9 +166,9 @@
         {/snippet}
       </Traffic>
     </div>
-  </div>
-  <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
-    <ActivityList title="Latest Activity">
+  </div> -->
+  <!-- <div class="grid grid-cols-1 gap-4 xl:grid-cols-2"> -->
+    <!-- <ActivityList title="Latest Activity">
       {#snippet actions()}
         <a href="#top" class="text-primary-700 dark:text-primary-500 inline-flex items-center rounded-lg p-2 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700"> View all </a>
       {/snippet}
@@ -189,9 +189,9 @@
           <p class="text-base font-normal text-gray-500 dark:text-gray-300">Get started with dozens of web components and interactive elements built on top of Tailwind CSS.</p>
         </TimelineItem>
       </Timeline>
-    </ActivityList>
+    </ActivityList> -->
     <Insights />
-  </div>
+  <!-- </div> -->
 
-  <Transactions {dark} />
+  <!-- <Transactions {dark} /> -->
 </div>

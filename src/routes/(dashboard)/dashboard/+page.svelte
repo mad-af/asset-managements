@@ -18,4 +18,3 @@
   <h1 class="hidden">Dashboard</h1>
   <Dashboard />
 </main>
-<Footer />

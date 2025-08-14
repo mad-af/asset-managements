@@ -72,6 +72,6 @@ export const actions: Actions = {
 		}
 
 		// Redirect dilakukan di luar try-catch untuk menghindari penangkapan error
-		return redirect(302, '/');
+		return redirect(302, '/dashboard');
 	}
 };

@@ -4,7 +4,7 @@ import type { LayoutServerLoad } from './$types';
 export const load: LayoutServerLoad = async (event) => {
 	// Jika user sudah login, redirect ke halaman utama
 	if (event.locals.session) {
-		redirect(302, '/');
+		redirect(302, '/dashboard');
 	}
 	return {};
 };
