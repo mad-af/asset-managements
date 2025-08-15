@@ -40,14 +40,11 @@
   let openDelete: boolean = $state(false); // modal control
 
   let open: boolean = $state(false);
-  let hidden: boolean = $state(true);
   let DrawerComponent: Component = $state(UserDrawer); // drawer component
 
   const toggle = (component: Component) => {
     DrawerComponent = component;
-    hidden = !hidden;
     open = !open;
-    console.log(selectedUser);
   };
 
   let selectedUser: any = $state({});
@@ -78,7 +75,7 @@
 
 <MetaTag {path} {description} {title} {subtitle} />
 
-<main class="relative h-full w-full overflow-y-auto bg-white dark:bg-gray-800">
+<main class="relative h-full w-full overflow-y-auto">
   <h1 class="hidden">CRUD: Users</h1>
   <div class="p-4">
     <Breadcrumb class="mb-5">
@@ -120,7 +117,7 @@
       class="border-y border-gray-200 bg-gray-100 dark:border-gray-700"
     >
       <TableHeadCell class="w-4 p-4"><Checkbox /></TableHeadCell>
-      {#each ["Name", "Biography", "Position", "Country", "Status", "Actions"] as title}
+      {#each ["Name", "Position", "Biography", "Status", "Actions"] as title}
         <TableHeadCell class="p-4 font-medium">{title}</TableHeadCell>
       {/each}
     </TableHead>
@@ -143,13 +140,12 @@
               </div>
             </div>
           </TableBodyCell>
+          <TableBodyCell class="p-4">{user.position}</TableBodyCell>
           <TableBodyCell
             class="max-w-sm truncate overflow-hidden p-4 text-base font-normal text-gray-500 xl:max-w-xs dark:text-gray-300"
           >
             {user.biography}
           </TableBodyCell>
-          <TableBodyCell class="p-4">{user.position}</TableBodyCell>
-          <TableBodyCell class="p-4">-</TableBodyCell>
           <TableBodyCell class="p-4 font-normal">
             <div class="flex items-center gap-2">
               <Indicator color={user.status === "Active" ? "green" : "red"} />
@@ -182,7 +178,7 @@
 <!-- Modals -->
 
 <Drawer placement="right" bind:open>
-  <DrawerComponent bind:hidden data={selectedUser} />
+  <DrawerComponent bind:open data={selectedUser} />
 </Drawer>
 <DeleteModal
   bind:open={openDelete}

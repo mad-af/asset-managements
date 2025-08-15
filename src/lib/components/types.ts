@@ -391,7 +391,7 @@ export interface ProductDrawerProps {
 }
 
 export interface UserDrawerProps {
-  hidden?: boolean;
+  open?: boolean;
   title?: string;
   data?: Record<string, string>;
 }

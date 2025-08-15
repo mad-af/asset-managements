@@ -13,7 +13,7 @@
   import { enhance } from "$app/forms";
   import { invalidateAll } from "$app/navigation";
 
-  let { hidden = $bindable(true), data }: UserDrawerProps = $props();
+  let { open = $bindable(false), data }: UserDrawerProps = $props();
 
   let title = $derived(
     data && Object.keys(data).length ? "Edit user" : "Add new user"
@@ -38,7 +38,7 @@
 
 <Heading tag="h5" class="mb-6 text-sm font-semibold uppercase">{title}</Heading>
 <CloseButton
-  onclick={() => (hidden = true)}
+  onclick={() => (open = false)}
   class="absolute top-2.5 right-2.5 text-gray-400 hover:text-black dark:text-white"
 />
 
@@ -47,9 +47,15 @@
   action={formAction}
   use:init
   use:enhance={() => {
-    return async ({ result, update }: { result: any; update: () => Promise<void> }) => {
+    return async ({
+      result,
+      update,
+    }: {
+      result: any;
+      update: () => Promise<void>;
+    }) => {
       if (result.type === "success") {
-        hidden = true;
+        open = false;
         await invalidateAll();
       } else if (result.type === "failure") {
         // Biarkan SvelteKit menangani error secara default
@@ -130,10 +136,11 @@
       <Button type="submit" class="w-full">
         {isEditing ? "Update user" : "Add user"}
       </Button>
+
       <Button
         color="alternative"
         class="w-full"
-        onclick={() => (hidden = true)}
+        onclick={() => ((open = false), console.log("hallo"))}
       >
         <CloseOutline />
         Cancel

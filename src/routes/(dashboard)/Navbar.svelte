@@ -106,7 +106,7 @@
   ];
 </script>
 
-<Navbar class="mx-10 sm:mx-0">
+<Navbar class="mx-10 sm:mx-0 ">
   <NavBrand href="/" class="mx-10">
     <img
       src="/images/flowbite-svelte-icon-logo.svg"

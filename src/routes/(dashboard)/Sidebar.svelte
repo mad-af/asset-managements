@@ -142,16 +142,16 @@
   {isOpen}
   {closeSidebar}
   params={{ x: -50, duration: 50 }}
-  class="top-0 left-0 mt-[69px] h-screen w-64 bg-gray-50 transition-transform lg:block dark:bg-gray-800 border-r rounded-lg border-gray-200 shadow-md dark:border-gray-700 "
+  class="top-0 left-0 mt-[69px] h-screen w-64 bg-gray-100 transition-transform lg:block dark:bg-gray-800 border-r rounded-lg border-gray-200 shadow-md dark:border-gray-700 "
   classes={{
-    div: "h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800",
+    div: "h-full px-3 py-4 overflow-y-auto bg-gray-100 dark:bg-gray-800",
     nonactive: "p-2",
     active: "p-2",
   }}
 >
   <h4 class="sr-only">Main menu</h4>
   <SidebarWrapper
-    class="scrolling-touch top-2 h-full max-w-2xs overflow-y-auto bg-white px-3 pt-6 lg:sticky lg:me-0 lg:block lg:h-[calc(100vh-4rem)] lg:pt-5 dark:bg-gray-800"
+    class="scrolling-touch top-2 h-full max-w-2xs overflow-y-auto bg-gray-100 px-3 pt-6 lg:sticky lg:me-0 lg:block lg:h-[calc(100vh-4rem)] lg:pt-5 dark:bg-gray-800"
   >
     <SidebarGroup class={groupClass}>
       {#each posts as { name, Icon, children, href } (name)}
