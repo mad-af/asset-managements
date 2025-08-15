@@ -1,151 +1,105 @@
 import type { PageServerLoad, Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import { 
-	getAllUsers, 
-	createUser, 
-	updateUser, 
-	deleteUser, 
-	isEmailTaken 
-} from '$lib/server/user';
+	checkout, 
+	returnAssignment, 
+	listAssignments,
+	AssetAlreadyAssignedError
+} from '$lib/server/assignment';
 
 export const load: PageServerLoad = async () => {
 	try {
-		const users = await getAllUsers();
+		const result = await listAssignments();
 		
 		// Transform data untuk UI
-		const transformedUsers = users.map(user => ({
-			...user,
-			name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'No Name',
-			status: 'Active' // Default status
+		const transformedAssignments = result.rows.map(assignment => ({
+			...assignment,
+			status: assignment.returnedAt ? 'Returned' : 'Active',
+			isOverdue: assignment.dueAt && !assignment.returnedAt && new Date(assignment.dueAt) < new Date()
 		}));
 		
 		return {
-			users: transformedUsers
+			assignments: transformedAssignments,
+			total: result.total
 		};
 	} catch (error) {
-		console.error('Error loading users:', error);
+		console.error('Error loading assignments:', error);
 		return {
-			users: []
+			assignments: [],
+			total: 0
 		};
 	}
 };
 
 export const actions: Actions = {
-	create: async ({ request }) => {
+	checkout: async ({ request }) => {
 		try {
 			const data = await request.formData();
-			const firstName = data.get('firstName') as string;
-			const lastName = data.get('lastName') as string;
-			const email = data.get('email') as string;
-			const position = data.get('position') as string;
-			const biography = data.get('biography') as string;
+			const assetId = data.get('assetId') as string;
+			const userId = data.get('userId') as string;
+			const dueAt = data.get('dueAt') as string;
+			const conditionOut = data.get('conditionOut') as string;
+			const notes = data.get('notes') as string;
 
 			// Validasi input
-			if (!firstName || !lastName || !email) {
-				console.log(123)
+			if (!assetId || !userId) {
 				return fail(400, {
-					message: 'First name, last name, email, and password are required'
+					message: 'Asset ID and User ID are required'
 				});
 			}
 
-			// Cek apakah email sudah digunakan
-			if (await isEmailTaken(email)) {
-				return fail(400, {
-					message: 'Email is already taken'
-				});
-			}
-
-			// Buat user baru
-			await createUser({
-				firstName,
-				lastName,
-				email,
-				position: position || undefined,
-				biography: biography || undefined
+			// Checkout asset
+			await checkout({
+				assetId,
+				userId,
+				dueAt: dueAt ? Math.floor(new Date(dueAt).getTime() / 1000) : undefined,
+				conditionOut: conditionOut || undefined,
+				notes: notes || undefined
 			});
 
 			return { success: true };
 		} catch (error) {
-			console.error('Error creating user:', error);
+			if (error instanceof AssetAlreadyAssignedError) {
+				return fail(400, {
+					message: error.message
+				});
+			}
+			console.error('Error checking out asset:', error);
 			return fail(500, {
-				message: 'Failed to create user'
+				message: 'Failed to checkout asset'
 			});
 		}
 	},
 
-	update: async ({ request }) => {
+	return: async ({ request }) => {
 		try {
 			const data = await request.formData();
 			const id = data.get('id') as string;
-			const firstName = data.get('firstName') as string;
-			const lastName = data.get('lastName') as string;
-			const email = data.get('email') as string;
-			const position = data.get('position') as string;
-			const biography = data.get('biography') as string;
+			const conditionIn = data.get('conditionIn') as string;
+			const notes = data.get('notes') as string;
 
 			// Validasi input
-			if (!id || !firstName || !lastName || !email) {
-				return fail(400, {
-					message: 'ID, first name, last name, and email are required'
-				});
-			}
-
-			// Cek apakah email sudah digunakan oleh user lain
-			if (await isEmailTaken(email, id)) {
-				return fail(400, {
-					message: 'Email is already taken by another user'
-				});
-			}
-
-			// Update user
-			const updateData: any = {
-				firstName,
-				lastName,
-				email,
-				position: position || undefined,
-				biography: biography || undefined
-			};
-
-			const updatedUser = await updateUser(id, updateData);
-			if (!updatedUser) {
-				return fail(404, {
-					message: 'User not found'
-				});
-			}
-
-			return { success: true };
-		} catch (error) {
-			console.error('Error updating user:', error);
-			return fail(500, {
-				message: 'Failed to update user'
-			});
-		}
-	},
-
-	delete: async ({ request }) => {
-		try {
-			const data = await request.formData();
-			const id = data.get('id') as string;
-
 			if (!id) {
 				return fail(400, {
-					message: 'User ID is required'
+					message: 'Assignment ID is required'
 				});
 			}
 
-			const deleted = await deleteUser(id);
-			if (!deleted) {
-				return fail(404, {
-					message: 'User not found'
-				});
-			}
+			// Return assignment
+			await returnAssignment(id, {
+				conditionIn: conditionIn || undefined,
+				notes: notes || undefined
+			});
 
 			return { success: true };
 		} catch (error) {
-			console.error('Error deleting user:', error);
+			console.error('Error returning assignment:', error);
 			return fail(500, {
-				message: 'Failed to delete user'
+				message: 'Failed to return assignment'
 			});
 		}
-	}
+	},
+
+	// Note: Assignment deletion is typically not allowed for audit purposes
+	// If needed, implement soft delete or archive functionality
 };

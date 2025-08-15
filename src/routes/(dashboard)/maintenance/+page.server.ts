@@ -1,31 +1,35 @@
 import type { PageServerLoad, Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import { 
-	getAllUsers, 
-	createUser, 
-	updateUser, 
-	deleteUser, 
-	isEmailTaken 
-} from '$lib/server/user';
+	openTicket, 
+	updateTicket, 
+	listTickets 
+} from '$lib/server/maintenance';
 
 export const load: PageServerLoad = async () => {
 	try {
-		const users = await getAllUsers();
+		const result = await listTickets();
 		
 		// Transform data untuk UI
-		const transformedUsers = users.map(user => ({
-			...user,
-			name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'No Name',
-			status: 'Active' // Default status
+		const transformedTickets = result.rows.map(ticket => ({
+			...ticket,
+			statusDisplay: ticket.status === 'open' ? 'Open' : 
+							 ticket.status === 'in_progress' ? 'In Progress' : 
+							 ticket.status === 'done' ? 'Done' : 'Canceled',
+			costDisplay: ticket.costCents ? `$${(ticket.costCents / 100).toFixed(2)}` : '$0.00',
+			durationDays: ticket.closedAt && ticket.openedAt ? 
+				Math.ceil((ticket.closedAt.getTime() - ticket.openedAt.getTime()) / (1000 * 60 * 60 * 24)) : null
 		}));
 		
 		return {
-			users: transformedUsers
+			tickets: transformedTickets,
+			total: result.total
 		};
 	} catch (error) {
-		console.error('Error loading users:', error);
+		console.error('Error loading maintenance tickets:', error);
 		return {
-			users: []
+			tickets: [],
+			total: 0
 		};
 	}
 };
@@ -34,41 +38,31 @@ export const actions: Actions = {
 	create: async ({ request }) => {
 		try {
 			const data = await request.formData();
-			const firstName = data.get('firstName') as string;
-			const lastName = data.get('lastName') as string;
-			const email = data.get('email') as string;
-			const position = data.get('position') as string;
-			const biography = data.get('biography') as string;
+			const assetId = data.get('assetId') as string;
+			const title = data.get('title') as string;
+			const description = data.get('description') as string;
+			const costCents = data.get('costCents') as string;
 
 			// Validasi input
-			if (!firstName || !lastName || !email) {
-				console.log(123)
+			if (!assetId || !title) {
 				return fail(400, {
-					message: 'First name, last name, email, and password are required'
+					message: 'Asset ID and title are required'
 				});
 			}
 
-			// Cek apakah email sudah digunakan
-			if (await isEmailTaken(email)) {
-				return fail(400, {
-					message: 'Email is already taken'
-				});
-			}
-
-			// Buat user baru
-			await createUser({
-				firstName,
-				lastName,
-				email,
-				position: position || undefined,
-				biography: biography || undefined
+			// Buat maintenance ticket baru
+			await openTicket({
+				assetId,
+				title,
+				description: description || undefined,
+				costCents: costCents ? parseInt(costCents) : 0
 			});
 
 			return { success: true };
 		} catch (error) {
-			console.error('Error creating user:', error);
+			console.error('Error creating maintenance ticket:', error);
 			return fail(500, {
-				message: 'Failed to create user'
+				message: 'Failed to create maintenance ticket'
 			});
 		}
 	},
@@ -77,74 +71,65 @@ export const actions: Actions = {
 		try {
 			const data = await request.formData();
 			const id = data.get('id') as string;
-			const firstName = data.get('firstName') as string;
-			const lastName = data.get('lastName') as string;
-			const email = data.get('email') as string;
-			const position = data.get('position') as string;
-			const biography = data.get('biography') as string;
+			const title = data.get('title') as string;
+			const description = data.get('description') as string;
+			const status = data.get('status') as string;
+			const costCents = data.get('costCents') as string;
 
 			// Validasi input
-			if (!id || !firstName || !lastName || !email) {
+			if (!id) {
 				return fail(400, {
-					message: 'ID, first name, last name, and email are required'
+					message: 'Ticket ID is required'
 				});
 			}
 
-			// Cek apakah email sudah digunakan oleh user lain
-			if (await isEmailTaken(email, id)) {
-				return fail(400, {
-					message: 'Email is already taken by another user'
-				});
-			}
+			// Update maintenance ticket
+			const updateData: any = {};
+			if (title) updateData.title = title;
+			if (description) updateData.description = description;
+			if (status) updateData.status = status;
+			if (costCents) updateData.costCents = parseInt(costCents);
 
-			// Update user
-			const updateData: any = {
-				firstName,
-				lastName,
-				email,
-				position: position || undefined,
-				biography: biography || undefined
-			};
-
-			const updatedUser = await updateUser(id, updateData);
-			if (!updatedUser) {
+			const updatedTicket = await updateTicket(id, updateData);
+			if (!updatedTicket) {
 				return fail(404, {
-					message: 'User not found'
+					message: 'Maintenance ticket not found'
 				});
 			}
 
 			return { success: true };
 		} catch (error) {
-			console.error('Error updating user:', error);
+			console.error('Error updating maintenance ticket:', error);
 			return fail(500, {
-				message: 'Failed to update user'
+				message: 'Failed to update maintenance ticket'
 			});
 		}
 	},
 
-	delete: async ({ request }) => {
+	close: async ({ request }) => {
 		try {
 			const data = await request.formData();
 			const id = data.get('id') as string;
 
 			if (!id) {
 				return fail(400, {
-					message: 'User ID is required'
+					message: 'Ticket ID is required'
 				});
 			}
 
-			const deleted = await deleteUser(id);
-			if (!deleted) {
+			// Close maintenance ticket by setting status to 'done'
+			const updatedTicket = await updateTicket(id, { status: 'done' });
+			if (!updatedTicket) {
 				return fail(404, {
-					message: 'User not found'
+					message: 'Maintenance ticket not found'
 				});
 			}
 
 			return { success: true };
 		} catch (error) {
-			console.error('Error deleting user:', error);
+			console.error('Error closing maintenance ticket:', error);
 			return fail(500, {
-				message: 'Failed to delete user'
+				message: 'Failed to close maintenance ticket'
 			});
 		}
 	}

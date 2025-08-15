@@ -28,8 +28,7 @@
   import {
     imagesPath,
     DeleteModal,
-    UserModal,
-    UserDrawer,
+    MaintenanceDrawer,
   } from "$lib/components";
   import MetaTag from "../../utils/MetaTag.svelte";
   import type { Component } from "svelte";
@@ -40,29 +39,29 @@
   let openDelete: boolean = $state(false); // modal control
 
   let open: boolean = $state(false);
-  let DrawerComponent: Component = $state(UserDrawer); // drawer component
+  let DrawerComponent: Component = $state(MaintenanceDrawer); // drawer component
 
   const toggle = (component: Component) => {
     DrawerComponent = component;
     open = !open;
   };
 
-  let selectedUser: any = $state({});
+  let selectedTicket: any = $state({});
   let searchTerm: string = $state("");
 
-  // Filter users based on search term
-  let filteredUsers = $derived(
-    data.users.filter(
-      (user) =>
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  // Filter tickets based on search term
+  let filteredTickets = $derived(
+    data.tickets.filter(
+      (ticket) =>
+        ticket.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+         ticket.assetId.toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
-  const path: string = "/crud/users";
+  const path: string = "/maintenance";
   const description: string =
-    "CRUD users examaple - Flowbite Svelte Admin Dashboard";
-  const title: string = "Flowbite Svelte Admin Dashboard - CRUD Users";
-  const subtitle: string = "CRUD Users";
+    "Maintenance Orders - Flowbite Svelte Admin Dashboard";
+  const title: string = "Flowbite Svelte Admin Dashboard - Maintenance Orders";
+  const subtitle: string = "Maintenance Orders";
 </script>
 
 {#if form?.message}
@@ -76,22 +75,22 @@
 <MetaTag {path} {description} {title} {subtitle} />
 
 <main class="relative h-full w-full overflow-y-auto">
-  <h1 class="hidden">CRUD: Users</h1>
+  <h1 class="hidden">Maintenance Orders</h1>
   <div class="p-4">
     <Breadcrumb class="mb-5">
       <BreadcrumbItem home href="/dashboard">Home</BreadcrumbItem>
-      <BreadcrumbItem href="/users">Users</BreadcrumbItem>
-      <BreadcrumbItem>List</BreadcrumbItem>
+      <BreadcrumbItem href="/maintenance">Maintenance</BreadcrumbItem>
+      <BreadcrumbItem>Orders</BreadcrumbItem>
     </Breadcrumb>
     <Heading
       tag="h1"
       class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white"
-      >All users</Heading
+      >All maintenance orders</Heading
     >
 
     <Toolbar embedded class="w-full py-4 text-gray-500  dark:text-gray-300">
       <Input
-        placeholder="Search for users"
+        placeholder="Search for maintenance orders"
         class="me-4 w-80 border xl:w-96"
         bind:value={searchTerm}
       />
@@ -101,9 +100,9 @@
           <Button
             size="sm"
             class="gap-2 px-3 whitespace-nowrap"
-            onclick={() => ((selectedUser = {}), toggle(UserDrawer))}
+            onclick={() => ((selectedTicket = {}), toggle(MaintenanceDrawer))}
           >
-            <PlusOutline size="sm" />Add user
+            <PlusOutline size="sm" />Open ticket
           </Button>
           <!-- <Button size="sm" color="alternative" class="gap-2 px-3">
             <DownloadSolid size="md" class="-ml-1" />Export
@@ -117,12 +116,12 @@
       class="border-y border-gray-200 bg-gray-100 dark:border-gray-700"
     >
       <TableHeadCell class="w-4 p-4"><Checkbox /></TableHeadCell>
-      {#each ["Name", "Position", "Biography", "Status", "Actions"] as title}
+      {#each ["Title", "Asset", "Status", "Cost", "Duration", "Actions"] as title}
         <TableHeadCell class="p-4 font-medium">{title}</TableHeadCell>
       {/each}
     </TableHead>
     <TableBody>
-      {#each filteredUsers as user}
+      {#each filteredTickets as ticket}
         <TableBodyRow class="text-base">
           <TableBodyCell class="w-4 p-4"><Checkbox /></TableBodyCell>
           <TableBodyCell
@@ -133,40 +132,37 @@
               <div
                 class="text-base font-semibold text-gray-900 dark:text-white"
               >
-                {user.name}
+                {ticket.title}
               </div>
               <div class="text-sm font-normal text-gray-500 dark:text-gray-300">
-                {user.email}
+                #{ticket.id}
               </div>
             </div>
           </TableBodyCell>
-          <TableBodyCell class="p-4">{user.position}</TableBodyCell>
-          <TableBodyCell
-            class="max-w-sm truncate overflow-hidden p-4 text-base font-normal text-gray-500 xl:max-w-xs dark:text-gray-300"
-          >
-            {user.biography}
-          </TableBodyCell>
+          <TableBodyCell class="p-4">Asset #{ticket.assetId}</TableBodyCell>
           <TableBodyCell class="p-4 font-normal">
             <div class="flex items-center gap-2">
-              <Indicator color={user.status === "Active" ? "green" : "red"} />
-              {user.status}
+              <Indicator color={ticket.status === "done" ? "green" : ticket.status === "in_progress" ? "yellow" : "red"} />
+              {ticket.statusDisplay}
             </div>
           </TableBodyCell>
+          <TableBodyCell class="p-4">{ticket.costDisplay}</TableBodyCell>
+          <TableBodyCell class="p-4">{ticket.durationDays ? `${ticket.durationDays} days` : 'Ongoing'}</TableBodyCell>
           <TableBodyCell class="space-x-2 p-4">
             <Button
               size="sm"
               class="gap-2 px-3"
-              onclick={() => ((selectedUser = user), toggle(UserDrawer))}
+              onclick={() => ((selectedTicket = ticket), toggle(MaintenanceDrawer))}
             >
-              <EditOutline size="sm" /> Edit user
+              <EditOutline size="sm" /> Edit ticket
             </Button>
             <Button
               color="red"
               size="sm"
               class="gap-2 px-3"
-              onclick={() => ((selectedUser = user), (openDelete = true))}
+              onclick={() => ((selectedTicket = ticket), (openDelete = true))}
             >
-              <TrashBinSolid size="sm" /> Delete user
+              <TrashBinSolid size="sm" /> Close ticket
             </Button>
           </TableBodyCell>
         </TableBodyRow>
@@ -178,10 +174,10 @@
 <!-- Modals -->
 
 <Drawer placement="right" bind:open>
-  <DrawerComponent bind:open data={selectedUser} />
+  <DrawerComponent bind:open data={selectedTicket} />
 </Drawer>
 <DeleteModal
   bind:open={openDelete}
-  title={`Are you sure you want to delete ${selectedUser?.name || "this user"}?`}
-  userId={selectedUser?.id}
+  title={`Are you sure you want to close ${selectedTicket?.title || "this ticket"}?`}
+  userId={selectedTicket?.id}
 />

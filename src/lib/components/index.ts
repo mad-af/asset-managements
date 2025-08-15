@@ -48,6 +48,9 @@ export { default as UserProfile } from './UserProfile.svelte';
 export { default as AssetDrawer } from './AssetDrawer.svelte';
 export { default as LocationDrawer } from './LocationDrawer.svelte';
 export { default as CategoryDrawer } from './CategoryDrawer.svelte';
+export { default as AssignmentDrawer } from './AssignmentDrawer.svelte';
+export { default as AuditDrawer } from './AuditDrawer.svelte';
+export { default as MaintenanceDrawer } from './MaintenanceDrawer.svelte';
 
 export * from './variables';
 export { default as getChartOptions } from './chart_options';
