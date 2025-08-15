@@ -28,8 +28,7 @@
   import {
     imagesPath,
     DeleteModal,
-    UserModal,
-    UserDrawer,
+    CategoryDrawer,
   } from "$lib/components";
   import MetaTag from "../../utils/MetaTag.svelte";
   import type { Component } from "svelte";
@@ -40,29 +39,29 @@
   let openDelete: boolean = $state(false); // modal control
 
   let open: boolean = $state(false);
-  let DrawerComponent: Component = $state(UserDrawer); // drawer component
+  let DrawerComponent: Component = $state(CategoryDrawer); // drawer component
 
   const toggle = (component: Component) => {
     DrawerComponent = component;
     open = !open;
   };
 
-  let selectedUser: any = $state({});
+  let selectedCategory: any = $state({});
   let searchTerm: string = $state("");
 
-  // Filter users based on search term
-  let filteredUsers = $derived(
-    data.users.filter(
-      (user) =>
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  // Filter categories based on search term
+  let filteredCategories = $derived(
+    data.categories.filter(
+      (category) =>
+        category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (category.description && category.description.toLowerCase().includes(searchTerm.toLowerCase()))
     )
   );
-  const path: string = "/crud/users";
+  const path: string = "/crud/categories";
   const description: string =
-    "CRUD users examaple - Flowbite Svelte Admin Dashboard";
-  const title: string = "Flowbite Svelte Admin Dashboard - CRUD Users";
-  const subtitle: string = "CRUD Users";
+    "CRUD categories example - Flowbite Svelte Admin Dashboard";
+  const title: string = "Flowbite Svelte Admin Dashboard - CRUD Categories";
+  const subtitle: string = "CRUD Categories";
 </script>
 
 {#if form?.message}
@@ -76,22 +75,22 @@
 <MetaTag {path} {description} {title} {subtitle} />
 
 <main class="relative h-full w-full overflow-y-auto">
-  <h1 class="hidden">CRUD: Users</h1>
+  <h1 class="hidden">CRUD: Categories</h1>
   <div class="p-4">
     <Breadcrumb class="mb-5">
       <BreadcrumbItem home href="/dashboard">Home</BreadcrumbItem>
-      <BreadcrumbItem href="/users">Users</BreadcrumbItem>
+      <BreadcrumbItem href="/categories">Categories</BreadcrumbItem>
       <BreadcrumbItem>List</BreadcrumbItem>
     </Breadcrumb>
     <Heading
       tag="h1"
       class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white"
-      >All users</Heading
+      >All categories</Heading
     >
 
     <Toolbar embedded class="w-full py-4 text-gray-500  dark:text-gray-300">
       <Input
-        placeholder="Search for users"
+        placeholder="Search for categories"
         class="me-4 w-80 border xl:w-96"
         bind:value={searchTerm}
       />
@@ -101,9 +100,9 @@
           <Button
             size="sm"
             class="gap-2 px-3 whitespace-nowrap"
-            onclick={() => ((selectedUser = {}), toggle(UserDrawer))}
+            onclick={() => ((selectedCategory = {}), toggle(CategoryDrawer))}
           >
-            <PlusOutline size="sm" />Add user
+            <PlusOutline size="sm" />Add category
           </Button>
           <!-- <Button size="sm" color="alternative" class="gap-2 px-3">
             <DownloadSolid size="md" class="-ml-1" />Export
@@ -117,56 +116,42 @@
       class="border-y border-gray-200 bg-gray-100 dark:border-gray-700"
     >
       <TableHeadCell class="w-4 p-4"><Checkbox /></TableHeadCell>
-      {#each ["Name", "Position", "Biography", "Status", "Actions"] as title}
+      {#each ["Name", "Description", "Created", "Actions"] as title}
         <TableHeadCell class="p-4 font-medium">{title}</TableHeadCell>
       {/each}
     </TableHead>
     <TableBody>
-      {#each filteredUsers as user}
+      {#each filteredCategories as category}
         <TableBodyRow class="text-base">
           <TableBodyCell class="w-4 p-4"><Checkbox /></TableBodyCell>
-          <TableBodyCell
-            class="mr-12 flex items-center space-x-6 p-4 whitespace-nowrap"
-          >
-            <Avatar />
-            <div class="text-sm font-normal text-gray-500 dark:text-gray-300">
-              <div
-                class="text-base font-semibold text-gray-900 dark:text-white"
-              >
-                {user.name}
-              </div>
-              <div class="text-sm font-normal text-gray-500 dark:text-gray-300">
-                {user.email}
-              </div>
+          <TableBodyCell class="p-4">
+            <div class="text-base font-semibold text-gray-900 dark:text-white">
+              {category.name}
             </div>
           </TableBodyCell>
-          <TableBodyCell class="p-4">{user.position}</TableBodyCell>
           <TableBodyCell
             class="max-w-sm truncate overflow-hidden p-4 text-base font-normal text-gray-500 xl:max-w-xs dark:text-gray-300"
           >
-            {user.biography}
+            {category.description || 'No description'}
           </TableBodyCell>
-          <TableBodyCell class="p-4 font-normal">
-            <div class="flex items-center gap-2">
-              <Indicator color={user.status === "Active" ? "green" : "red"} />
-              {user.status}
-            </div>
+          <TableBodyCell class="p-4 font-normal text-gray-500 dark:text-gray-300">
+            {new Date(category.createdAt).toLocaleDateString()}
           </TableBodyCell>
           <TableBodyCell class="space-x-2 p-4">
             <Button
               size="sm"
               class="gap-2 px-3"
-              onclick={() => ((selectedUser = user), toggle(UserDrawer))}
+              onclick={() => ((selectedCategory = category), toggle(CategoryDrawer))}
             >
-              <EditOutline size="sm" /> Edit user
+              <EditOutline size="sm" /> Edit category
             </Button>
             <Button
               color="red"
               size="sm"
               class="gap-2 px-3"
-              onclick={() => ((selectedUser = user), (openDelete = true))}
+              onclick={() => ((selectedCategory = category), (openDelete = true))}
             >
-              <TrashBinSolid size="sm" /> Delete user
+              <TrashBinSolid size="sm" /> Delete category
             </Button>
           </TableBodyCell>
         </TableBodyRow>
@@ -178,10 +163,10 @@
 <!-- Modals -->
 
 <Drawer placement="right" bind:open>
-  <DrawerComponent bind:open data={selectedUser} />
+  <DrawerComponent bind:open data={selectedCategory} />
 </Drawer>
 <DeleteModal
   bind:open={openDelete}
-  title={`Are you sure you want to delete ${selectedUser?.name || "this user"}?`}
-  userId={selectedUser?.id}
+  title={`Are you sure you want to delete ${selectedCategory?.name || "this category"}?`}
+  userId={selectedCategory?.id}
 />

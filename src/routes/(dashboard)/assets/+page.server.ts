@@ -1,31 +1,24 @@
 import type { PageServerLoad, Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import { 
-	getAllUsers, 
-	createUser, 
-	updateUser, 
-	deleteUser, 
-	isEmailTaken 
-} from '$lib/server/user';
+	listAssets, 
+	createAsset, 
+	updateAsset, 
+	deleteAsset,
+	UniqueConstraintError
+} from '$lib/server/asset';
 
 export const load: PageServerLoad = async () => {
 	try {
-		const users = await getAllUsers();
-		
-		// Transform data untuk UI
-		const transformedUsers = users.map(user => ({
-			...user,
-			name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'No Name',
-			status: 'Active' // Default status
-		}));
+		const { rows: assets } = await listAssets();
 		
 		return {
-			users: transformedUsers
+			assets
 		};
 	} catch (error) {
-		console.error('Error loading users:', error);
+		console.error('Error loading assets:', error);
 		return {
-			users: []
+			assets: []
 		};
 	}
 };
@@ -34,41 +27,42 @@ export const actions: Actions = {
 	create: async ({ request }) => {
 		try {
 			const data = await request.formData();
-			const firstName = data.get('firstName') as string;
-			const lastName = data.get('lastName') as string;
-			const email = data.get('email') as string;
-			const position = data.get('position') as string;
-			const biography = data.get('biography') as string;
+			const code = data.get('code') as string;
+			const name = data.get('name') as string;
+			const categoryId = data.get('categoryId') as string;
+			const locationId = data.get('locationId') as string;
+			const status = data.get('status') as string;
+			const serialNo = data.get('serialNo') as string;
+			const notes = data.get('notes') as string;
 
 			// Validasi input
-			if (!firstName || !lastName || !email) {
-				console.log(123)
+			if (!code || !name) {
 				return fail(400, {
-					message: 'First name, last name, email, and password are required'
+					message: 'Code and name are required'
 				});
 			}
 
-			// Cek apakah email sudah digunakan
-			if (await isEmailTaken(email)) {
-				return fail(400, {
-					message: 'Email is already taken'
-				});
-			}
-
-			// Buat user baru
-			await createUser({
-				firstName,
-				lastName,
-				email,
-				position: position || undefined,
-				biography: biography || undefined
+			// Buat asset baru
+			await createAsset({
+				code,
+				name,
+				categoryId: categoryId || null,
+				locationId: locationId || null,
+				status: (status as any) || 'active',
+				serialNo: serialNo || null,
+				notes: notes || null
 			});
 
 			return { success: true };
 		} catch (error) {
-			console.error('Error creating user:', error);
+			if (error instanceof UniqueConstraintError) {
+				return fail(400, {
+					message: error.message
+				});
+			}
+			console.error('Error creating asset:', error);
 			return fail(500, {
-				message: 'Failed to create user'
+				message: 'Failed to create asset'
 			});
 		}
 	},
@@ -77,47 +71,49 @@ export const actions: Actions = {
 		try {
 			const data = await request.formData();
 			const id = data.get('id') as string;
-			const firstName = data.get('firstName') as string;
-			const lastName = data.get('lastName') as string;
-			const email = data.get('email') as string;
-			const position = data.get('position') as string;
-			const biography = data.get('biography') as string;
+			const code = data.get('code') as string;
+			const name = data.get('name') as string;
+			const categoryId = data.get('categoryId') as string;
+			const locationId = data.get('locationId') as string;
+			const status = data.get('status') as string;
+			const serialNo = data.get('serialNo') as string;
+			const notes = data.get('notes') as string;
 
 			// Validasi input
-			if (!id || !firstName || !lastName || !email) {
+			if (!id || !code || !name) {
 				return fail(400, {
-					message: 'ID, first name, last name, and email are required'
+					message: 'ID, code, and name are required'
 				});
 			}
 
-			// Cek apakah email sudah digunakan oleh user lain
-			if (await isEmailTaken(email, id)) {
-				return fail(400, {
-					message: 'Email is already taken by another user'
-				});
-			}
-
-			// Update user
+			// Update asset
 			const updateData: any = {
-				firstName,
-				lastName,
-				email,
-				position: position || undefined,
-				biography: biography || undefined
+				code,
+				name,
+				categoryId: categoryId || null,
+				locationId: locationId || null,
+				status: (status as any) || 'active',
+				serialNo: serialNo || null,
+				notes: notes || null
 			};
 
-			const updatedUser = await updateUser(id, updateData);
-			if (!updatedUser) {
+			const updatedAsset = await updateAsset(id, updateData);
+			if (!updatedAsset) {
 				return fail(404, {
-					message: 'User not found'
+					message: 'Asset not found'
 				});
 			}
 
 			return { success: true };
 		} catch (error) {
-			console.error('Error updating user:', error);
+			if (error instanceof UniqueConstraintError) {
+				return fail(400, {
+					message: error.message
+				});
+			}
+			console.error('Error updating asset:', error);
 			return fail(500, {
-				message: 'Failed to update user'
+				message: 'Failed to update asset'
 			});
 		}
 	},
@@ -129,22 +125,17 @@ export const actions: Actions = {
 
 			if (!id) {
 				return fail(400, {
-					message: 'User ID is required'
+					message: 'Asset ID is required'
 				});
 			}
 
-			const deleted = await deleteUser(id);
-			if (!deleted) {
-				return fail(404, {
-					message: 'User not found'
-				});
-			}
+			await deleteAsset(id);
 
 			return { success: true };
 		} catch (error) {
-			console.error('Error deleting user:', error);
+			console.error('Error deleting asset:', error);
 			return fail(500, {
-				message: 'Failed to delete user'
+				message: 'Failed to delete asset'
 			});
 		}
 	}
