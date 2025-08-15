@@ -15,9 +15,14 @@
   interface LocationDrawerProps {
     open?: boolean;
     data?: Record<string, any>;
+    locations?: Array<{ id: string; name: string; parentId: string | null }>;
   }
 
-  let { open = $bindable(false), data }: LocationDrawerProps = $props();
+  let {
+    open = $bindable(false),
+    data,
+    locations = [],
+  }: LocationDrawerProps = $props();
 
   let title = $derived(
     data && Object.keys(data).length ? "Edit location" : "Add new location"
@@ -33,6 +38,8 @@
         if (el instanceof HTMLInputElement) {
           el.value = data[key] || "";
         } else if (el instanceof HTMLTextAreaElement) {
+          el.value = data[key] || "";
+        } else if (el instanceof HTMLSelectElement) {
           el.value = data[key] || "";
         }
       }
@@ -84,12 +91,17 @@
     </Label>
 
     <Label class="space-y-2">
-      <span>Parent Location ID</span>
-      <Input
+      <span>Parent Location</span>
+      <Select
         name="parentId"
         class="border outline-none"
-        placeholder="e.g. parent-location-id (optional)"
-      />
+        placeholder="Select parent location (optional)"
+      >
+        <option value="" selected>No parent location</option>
+        {#each locations as location}
+          <option value={location.id}>{location.name}</option>
+        {/each}
+      </Select>
     </Label>
 
     <Label class="space-y-2">

@@ -15,9 +15,10 @@
   interface MaintenanceDrawerProps {
     open?: boolean;
     data?: Record<string, any>;
+    assets?: Array<{ id: string; name: string; }>;
   }
 
-  let { open = $bindable(false), data }: MaintenanceDrawerProps = $props();
+  let { open = $bindable(false), data, assets = [] }: MaintenanceDrawerProps = $props();
 
   let title = $derived(
     data && Object.keys(data).length ? "Edit maintenance order" : "Open new ticket"
@@ -33,6 +34,8 @@
         if (el instanceof HTMLInputElement) {
           el.value = data[key] || "";
         } else if (el instanceof HTMLTextAreaElement) {
+          el.value = data[key] || "";
+        } else if (el instanceof HTMLSelectElement) {
           el.value = data[key] || "";
         }
       }
@@ -75,12 +78,16 @@
   <div class="space-y-4">
     <Label class="space-y-2">
       <span>Asset ID *</span>
-      <Input
+      <Select
         name="assetId"
         class="border outline-none"
-        placeholder="e.g. ASSET-001"
         required
-      />
+      >
+        <option value="">Select an asset</option>
+        {#each assets as asset}
+          <option value={asset.id}>{asset.name} ({asset.id})</option>
+        {/each}
+      </Select>
     </Label>
 
     <Label class="space-y-2">

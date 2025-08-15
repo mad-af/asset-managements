@@ -1,3 +1,5 @@
+import UserDrawer from './UserDrawer.svelte';
+
 export { default as Accounts } from './Accounts.svelte';
 export { default as ActivityList } from './ActivityList.svelte';
 export { default as AppsMenu } from './AppsMenu.svelte';
@@ -51,6 +53,7 @@ export { default as CategoryDrawer } from './CategoryDrawer.svelte';
 export { default as AssignmentDrawer } from './AssignmentDrawer.svelte';
 export { default as AuditDrawer } from './AuditDrawer.svelte';
 export { default as MaintenanceDrawer } from './MaintenanceDrawer.svelte';
+export { default as UserDrawer } from './UserDrawer.svelte';
 
 export * from './variables';
 export { default as getChartOptions } from './chart_options';

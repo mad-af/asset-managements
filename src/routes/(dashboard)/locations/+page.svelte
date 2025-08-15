@@ -175,7 +175,7 @@
 <!-- Modals -->
 
 <Drawer placement="right" bind:open>
-  <DrawerComponent bind:open data={selectedLocation} />
+  <DrawerComponent bind:open data={selectedLocation} locations={data.locations} />
 </Drawer>
 <DeleteModal
   bind:open={openDelete}

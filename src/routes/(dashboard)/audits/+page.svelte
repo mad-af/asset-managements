@@ -185,5 +185,5 @@
 <!-- Modals -->
 
 <Drawer placement="right" bind:open>
-  <DrawerComponent bind:open data={selectedAudit} />
+  <DrawerComponent bind:open data={selectedAudit} locations={data.locations} />
 </Drawer>

@@ -6,10 +6,14 @@ import {
 	listAssignments,
 	AssetAlreadyAssignedError
 } from '$lib/server/assignment';
+import { listAssets } from '$lib/server/asset';
+import { getAllUsers } from '$lib/server/user';
 
 export const load: PageServerLoad = async () => {
 	try {
 		const result = await listAssignments();
+		const { rows: assets } = await listAssets();
+		const users = await getAllUsers();
 		
 		// Transform data untuk UI
 		const transformedAssignments = result.rows.map(assignment => ({
@@ -20,13 +24,17 @@ export const load: PageServerLoad = async () => {
 		
 		return {
 			assignments: transformedAssignments,
-			total: result.total
+			total: result.total,
+			assets,
+			users
 		};
 	} catch (error) {
 		console.error('Error loading assignments:', error);
 		return {
 			assignments: [],
-			total: 0
+			total: 0,
+			assets: [],
+			users: []
 		};
 	}
 };

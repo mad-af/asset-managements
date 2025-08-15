@@ -15,9 +15,16 @@
   interface AssetDrawerProps {
     open?: boolean;
     data?: Record<string, any>;
+    categories?: Array<{ id: string; name: string }>;
+    locations?: Array<{ id: string; name: string }>;
   }
 
-  let { open = $bindable(false), data }: AssetDrawerProps = $props();
+  let {
+    open = $bindable(false),
+    data,
+    categories = [],
+    locations = [],
+  }: AssetDrawerProps = $props();
 
   let title = $derived(
     data && Object.keys(data).length ? "Edit asset" : "Add new asset"
@@ -33,6 +40,8 @@
         if (el instanceof HTMLInputElement) {
           el.value = data[key] || "";
         } else if (el instanceof HTMLTextAreaElement) {
+          el.value = data[key] || "";
+        } else if (el instanceof HTMLSelectElement) {
           el.value = data[key] || "";
         }
       }
@@ -94,23 +103,31 @@
     </Label>
 
     <Label class="space-y-2">
-      <span>Category ID</span>
-      <Input
+      <span>Category</span>
+      <Select
         name="categoryId"
-        type="number"
         class="border outline-none"
-        placeholder="e.g. 1"
-      />
+        placeholder="Select category (optional)"
+      >
+        <option value="">No category</option>
+        {#each categories as category}
+          <option value={category.id}>{category.name}</option>
+        {/each}
+      </Select>
     </Label>
 
     <Label class="space-y-2">
-      <span>Location ID</span>
-      <Input
+      <span>Location</span>
+      <Select
         name="locationId"
-        type="number"
         class="border outline-none"
-        placeholder="e.g. 1"
-      />
+        placeholder="Select location (optional)"
+      >
+        <option value="">No location</option>
+        {#each locations as location}
+          <option value={location.id}>{location.name}</option>
+        {/each}
+      </Select>
     </Label>
 
     <Label class="space-y-2">

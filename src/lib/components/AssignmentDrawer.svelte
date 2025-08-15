@@ -16,9 +16,11 @@
     open?: boolean;
     data?: Record<string, any>;
     isCheckout?: boolean;
+    assets?: Array<{ id: string; name: string; }>;
+    users?: Array<{ id: string; name: string; email: string; }>;
   }
 
-  let { open = $bindable(false), data, isCheckout = true }: AssignmentDrawerProps = $props();
+  let { open = $bindable(false), data, isCheckout = true, assets = [], users = [] }: AssignmentDrawerProps = $props();
 
   let title = $derived(
     isCheckout ? "Checkout Asset" : "Return Asset"
@@ -33,6 +35,8 @@
         if (el instanceof HTMLInputElement) {
           el.value = data[key] || "";
         } else if (el instanceof HTMLTextAreaElement) {
+          el.value = data[key] || "";
+        } else if (el instanceof HTMLSelectElement) {
           el.value = data[key] || "";
         }
       }
@@ -76,22 +80,28 @@
     {#if isCheckout}
       <Label class="space-y-2">
         <span>Asset ID *</span>
-        <Input
+        <Select
           name="assetId"
           class="border outline-none"
-          placeholder="e.g. asset-123"
           required
-        />
+        >
+          {#each assets as asset}
+            <option value={asset.id}>{asset.name} ({asset.id})</option>
+          {/each}
+        </Select>
       </Label>
 
       <Label class="space-y-2">
         <span>User ID *</span>
-        <Input
+        <Select
           name="userId"
           class="border outline-none"
-          placeholder="e.g. user-456"
           required
-        />
+        >
+          {#each users as user}
+            <option value={user.id}>{user.name} ({user.email})</option>
+          {/each}
+        </Select>
       </Label>
 
       <Label class="space-y-2">

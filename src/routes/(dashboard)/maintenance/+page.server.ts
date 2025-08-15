@@ -5,10 +5,12 @@ import {
 	updateTicket, 
 	listTickets 
 } from '$lib/server/maintenance';
+import { listAssets } from '$lib/server/asset';
 
 export const load: PageServerLoad = async () => {
 	try {
 		const result = await listTickets();
+		const { rows: assets } = await listAssets();
 		
 		// Transform data untuk UI
 		const transformedTickets = result.rows.map(ticket => ({
@@ -23,13 +25,15 @@ export const load: PageServerLoad = async () => {
 		
 		return {
 			tickets: transformedTickets,
-			total: result.total
+			total: result.total,
+			assets
 		};
 	} catch (error) {
 		console.error('Error loading maintenance tickets:', error);
 		return {
 			tickets: [],
-			total: 0
+			total: 0,
+			assets: []
 		};
 	}
 };

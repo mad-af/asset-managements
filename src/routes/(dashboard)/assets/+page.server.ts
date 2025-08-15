@@ -7,18 +7,26 @@ import {
 	deleteAsset,
 	UniqueConstraintError
 } from '$lib/server/asset';
+import { listCategories } from '$lib/server/category';
+import { listLocations } from '$lib/server/location';
 
 export const load: PageServerLoad = async () => {
 	try {
 		const { rows: assets } = await listAssets();
+		const categories = await listCategories();
+		const locations = await listLocations();
 		
 		return {
-			assets
+			assets,
+			categories,
+			locations
 		};
 	} catch (error) {
 		console.error('Error loading assets:', error);
 		return {
-			assets: []
+			assets: [],
+			categories: [],
+			locations: []
 		};
 	}
 };

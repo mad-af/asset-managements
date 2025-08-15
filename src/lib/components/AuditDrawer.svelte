@@ -15,9 +15,14 @@
   interface AuditDrawerProps {
     open?: boolean;
     data?: Record<string, any>;
+    locations?: Array<{ id: string; name: string }>;
   }
 
-  let { open = $bindable(false), data }: AuditDrawerProps = $props();
+  let {
+    open = $bindable(false),
+    data,
+    locations = [],
+  }: AuditDrawerProps = $props();
 
   let title = $derived(
     data && Object.keys(data).length ? "Edit audit" : "Add new audit"
@@ -33,6 +38,8 @@
         if (el instanceof HTMLInputElement) {
           el.value = data[key] || "";
         } else if (el instanceof HTMLTextAreaElement) {
+          el.value = data[key] || "";
+        } else if (el instanceof HTMLSelectElement) {
           el.value = data[key] || "";
         }
       }
@@ -85,11 +92,12 @@
 
     <Label class="space-y-2">
       <span>Location ID</span>
-      <Input
-        name="locationId"
-        class="border outline-none"
-        placeholder="e.g. location-id (optional for all locations)"
-      />
+      <Select name="locationId" class="border outline-none">
+        <option value="">No location</option>
+        {#each locations as location}
+          <option value={location.id}>{location.name}</option>
+        {/each}
+      </Select>
     </Label>
 
     <Label class="space-y-2">

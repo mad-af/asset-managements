@@ -165,5 +165,5 @@
 <!-- Modals -->
 
 <Drawer placement="right" bind:open>
-  <DrawerComponent bind:open data={selectedAssignment} {isCheckout} />
+  <DrawerComponent bind:open data={selectedAssignment} {isCheckout} assets={data.assets} users={data.users} />
 </Drawer>

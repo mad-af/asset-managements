@@ -6,10 +6,12 @@ import {
 	startAudit, 
 	finalizeAudit 
 } from '$lib/server/audit';
+import { listLocations } from '$lib/server/location';
 
 export const load: PageServerLoad = async () => {
 	try {
 		const audits = await listAudits();
+		const locations = await listLocations();
 		
 		// Transform data untuk UI
 		const transformedAudits = audits.map(audit => ({
@@ -20,13 +22,15 @@ export const load: PageServerLoad = async () => {
 		
 		return {
 			audits: transformedAudits,
-			total: audits.length
+			total: audits.length,
+			locations
 		};
 	} catch (error) {
 		console.error('Error loading audits:', error);
 		return {
 			audits: [],
-			total: 0
+			total: 0,
+			locations: []
 		};
 	}
 };
