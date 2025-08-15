@@ -28,6 +28,13 @@
     FireOutline,
     BookOpenOutline,
     UserSolid,
+    CubeSolid,
+    ThumbsUpOutline,
+    CogSolid,
+    ClipboardCheckOutline,
+    DatabaseOutline,
+    TagOutline,
+    MapPinOutline,
   } from "flowbite-svelte-icons";
 
   interface Props {
@@ -72,7 +79,20 @@
     children?: Record<string, string>;
   }> = [
     { name: "Dashboard", Icon: ChartPieOutline, href: "/dashboard" },
+    { name: "Assets", Icon: CubeSolid, href: "/assets" },
+    { name: "Assignments", Icon: ClipboardListSolid, href: "/assignments" },
+    { name: "Maintenance", Icon: CogSolid, href: "/maintenance" },
+    { name: "Audits", Icon: ClipboardCheckOutline, href: "/audits" },
     { name: "Users", Icon: UserSolid, href: "/users" },
+    {
+      name: "Master Data",
+      Icon: DatabaseOutline,
+      children: {
+        Categories: "/categories",
+        Locations: "/locations",
+      },
+    },
+
     // {
     //   name: "CRUD",
     //   Icon: RectangleListSolid,
