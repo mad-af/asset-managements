@@ -37,6 +37,8 @@
 		"drizzle-orm": "^0.40.0",
 		"flowbite-svelte": "^1.12.3",
 		"flowbite-svelte-icons": "^2.2.1",
-		"runatics": "^0.1.4"
+		"nanoid": "^5.1.5",
+		"runatics": "^0.1.4",
+		"zod": "^4.0.17"
 	}
 }
