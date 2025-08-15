@@ -15,6 +15,13 @@
       "when": 1755182574903,
       "tag": "0001_wandering_alex_power",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1755225521308,
+      "tag": "0002_abnormal_doorman",
+      "breakpoints": true
     }
   ]
 }
