@@ -39,6 +39,7 @@
 		"flowbite-svelte-icons": "^2.2.1",
 		"nanoid": "^5.1.5",
 		"runatics": "^0.1.4",
+		"runes-meta-tags": "^0.4.4",
 		"zod": "^4.0.17"
 	}
 }
